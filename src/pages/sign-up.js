@@ -1,10 +1,14 @@
 import { useState, useContext, useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
 import FirebaseContext from "../context/firebase";
+import * as ROUTES from '../constants/routes' 
 
 export default function Login() {
   const history = useHistory();
   const { firebase } = useContext(FirebaseContext);
+
+  const [username, setUsername] = useState('')
+  const [fullName, setFullName] = useState('')
 
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
@@ -12,10 +16,16 @@ export default function Login() {
   const [error, setError] = useState("");
   const isInvalid = password === "" || emailAddress === "";
 
-  const handleLogin = () => {};
+  const handleSignUp = async (event) => {
+      event.preventDefault();
+
+      try {
+          
+      } catch (error) { }
+  };
 
   useEffect(() => {
-    document.title = "Login - Instagram";
+    document.title = "Sign Up - Instagram";
   }, []);
 
     return (
@@ -30,8 +40,24 @@ export default function Login() {
           </h1>
 
           {error && <p className="mb-4 text-xs text-red-primary">{error}</p>}
-            {/* Email address */}
-          <form onSubmit={handleLogin} method="POST">
+
+          <form onSubmit={handleSignUp} method="POST">
+            <input
+              aria-label="Enter your username"
+              type="text"
+              placeholder="Username"
+              className="text-sm text-gray-base w-full mr-3 py-5 px-4 h-2 border border-gray-primary rounded mb-2"
+              onChange={({ target }) => setUsername(target.value)}
+              value={username}
+            />
+            <input
+              aria-label="Enter your full name"
+              type="text"
+              placeholder="Full name"
+              className="text-sm text-gray-base w-full mr-3 py-5 px-4 h-2 border border-gray-primary rounded mb-2"
+              onChange={({ target }) => setFullName(target.value)}
+              value={fullName}
+            />
             <input
               aria-label="Enter your email address"
               type="text"
@@ -40,7 +66,6 @@ export default function Login() {
               onChange={({ target }) => setEmailAddress(target.value)}
               value={emailAddress}
             />
-            {/* Password */}
             <input
               aria-label="Enter your password"
               type="password"
@@ -49,25 +74,25 @@ export default function Login() {
               onChange={({ target }) => setPassword(target.value)}
               value={password}
             />
-            {/* Submit button */}
             <button
               disabled={isInvalid}
               type="submit"
               className={`bg-blue-medium text-white w-full rounded h-8 font-bold
             ${isInvalid && 'opacity-50'}`}
             >
-              Login
+              Sign Up
             </button>
           </form>
         </div>
         <div className="flex justify-center items-center flex-col w-full bg-white p-4 rounded border border-gray-primary">
           <p className="text-sm">
-            Don't have an account?{` `}
-            <Link to="/sign-up" className="font-bold text-blue-medium">
-              Sign up
+            Have an account?{` `}
+            <Link to={ROUTES.LOGIN} className="font-bold text-blue-medium">
+              Login
             </Link>
           </p>
         </div>
       </div>
     </div>
-  )}
+  );
+}
