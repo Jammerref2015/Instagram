@@ -1,6 +1,7 @@
 import { useState, useContext, useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
 import FirebaseContext from "../context/firebase";
+import * as ROUTES from '../constants/routes'
 
 export default function Login() {
   const history = useHistory();
@@ -12,7 +13,18 @@ export default function Login() {
   const [error, setError] = useState("");
   const isInvalid = password === "" || emailAddress === "";
 
-  const handleLogin = () => {};
+  const handleLogin = async (event) => {
+    event.preventDefault();
+
+    try {
+      await firebase.auth().signInWithEmailAndPassword(emailAddress, password)
+      history.push(ROUTES.DASHBOARD)
+    } catch (error) {
+      setEmailAddress('')
+      setPassword('')
+      setError(error.message)
+    }
+  };
 
   useEffect(() => {
     document.title = "Login - Instagram";
@@ -34,7 +46,8 @@ export default function Login() {
           <form onSubmit={handleLogin} method="POST">
             <input
               aria-label="Enter your email address"
-              type="text"
+              type="email"  
+              // change 'type' back to "text" if issues occur
               placeholder="Email address"
               className="text-sm text-gray-base w-full mr-3 py-5 px-4 h-2 border border-gray-primary rounded mb-2"
               onChange={({ target }) => setEmailAddress(target.value)}
@@ -63,7 +76,7 @@ export default function Login() {
         <div className="flex justify-center items-center flex-col w-full bg-white p-4 rounded border border-gray-primary">
           <p className="text-sm">
             Don't have an account?{` `}
-            <Link to="/sign-up" className="font-bold text-blue-medium">
+            <Link to={ROUTES.SIGN_UP} className="font-bold text-blue-medium">
               Sign up
             </Link>
           </p>

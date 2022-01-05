@@ -2,14 +2,14 @@ import { useState, useContext, useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
 import FirebaseContext from "../context/firebase";
 import * as ROUTES from '../constants/routes' 
+import { doesUsernameExist } from '../services/firebase'
 
-export default function Login() {
+export default function SignUp() {
   const history = useHistory();
   const { firebase } = useContext(FirebaseContext);
 
   const [username, setUsername] = useState('')
   const [fullName, setFullName] = useState('')
-
   const [emailAddress, setEmailAddress] = useState("");
   const [password, setPassword] = useState("");
 
@@ -19,11 +19,44 @@ export default function Login() {
   const handleSignUp = async (event) => {
       event.preventDefault();
 
-      try {
-          
-      } catch (error) { }
-  };
+      const usernameExists = await doesUsernameExist(username)
+      console.log('usernameExists', usernameExists)
+      if (!usernameExists.length) {
+          try {
+          const createdUserResult = await firebase
+            .auth()
+            .createUserWithEmailAndPassword(emailAddress, password)
 
+            //Authentication
+            // -> emailAddress & password & username & displayName
+            await createdUserResult.user.updateProfile({
+              displayName: username
+            })
+
+            // firebase user collection (create a document)
+            await firebase.firestore().collection('users').add({
+              userId: createdUserResult.user.uid,
+              username: username.toLowerCase(),
+              // fullName: fullName.toLowerCase(),
+              fullName: '',
+              emailAddress: emailAddress.toLowerCase(),
+              following: [], //Stick uid in here if you want someone to follow you instantly
+              dateCreated: Date.now()
+            })
+
+            history.push(ROUTES.DASHBOARD)
+      } catch (error) {
+          setFullName('')
+          setEmailAddress('')
+          setPassword('')
+          setError(error.message)
+       } 
+  } else {
+    setUsername('');
+    setError('That username is already taken, please try another.');
+  }
+}
+    
   useEffect(() => {
     document.title = "Sign Up - Instagram";
   }, []);
